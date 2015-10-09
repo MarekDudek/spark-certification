@@ -1,6 +1,11 @@
-# SBT-specific
+# Scala, Spark & SBT-specific
 
 target/
+
+.cache-main
+
+derby.log
+metastore_db/
 
 # Eclipse-specific
 
@@ -11,3 +16,4 @@ target/
 # Gvim swap files
 
 *.swp
+/bin/
