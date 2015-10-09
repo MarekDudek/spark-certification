@@ -1,3 +1,13 @@
-*.swp
+# SBT-specific
 
 target/
+
+# Eclipse-specific
+
+.classpath
+.project
+.settings/
+
+# Gvim swap files
+
+*.swp
