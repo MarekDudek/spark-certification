@@ -1,19 +1,31 @@
-# Scala, Spark & SBT-specific
+# Eclipse-specific
+.classpath
+.project
+.settings/
 
+# Scala-IDE specific
+.scala_dependencies
+.worksheet
+
+# vim swap files
+*.swp
+
+/bin/
+*.class
+*.log
+
+# sbt specific
+.cache
+.history
+.lib/
+dist/*
 target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
 
 .cache-main
 
 derby.log
 metastore_db/
-
-# Eclipse-specific
-
-.classpath
-.project
-.settings/
-
-# Gvim swap files
-
-*.swp
-/bin/
