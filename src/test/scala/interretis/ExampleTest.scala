@@ -1,34 +1,26 @@
 package interretis
 
 import org.scalatest.FlatSpec
-import org.scalatest.BeforeAndAfterAll
-import org.apache.spark.SparkConf
-import org.apache.spark.SparkContext
-import language.postfixOps
 import org.scalatest.Matchers
 
-class ExampleTest extends FlatSpec with Matchers with BeforeAndAfterAll {
+import org.apache.spark.SparkConf
+import org.apache.spark.SparkContext
+
+import interretis.SparkTestContext.createTestContext
+
+import language.postfixOps
+
+class ExampleTest extends FlatSpec with Matchers {
 
   // given
-
-  var context: SparkContext = null
-
-  override def beforeAll: Unit = {
-
-    val config = new SparkConf()
-    config setAppName "Example application"
-    config setMaster "local"
-
-    context = new SparkContext(config)
-  }
-
+  val context = createTestContext()
   val book = "src/main/resources/alice-in-wonderland.txt"
 
   "This test" should "check Spark processing" in {
 
     // when
     val verses = context textFile book cache
-    val alices = verses filter (_.contains("Alice"))
+    val alices = verses filter (_ contains "Alice")
     val characterCount = alices count
 
     // then
