@@ -1,26 +1,23 @@
 package interretis.utils
 
-import org.scalatest.Suite
-import org.scalatest.BeforeAndAfterAll
-
 import org.apache.spark.SparkContext
+import interretis.utils.TestSparkContext.createTestContext
+
+import org.scalatest.fixture.FlatSpec
+import org.scalatest.Outcome
 
 import language.postfixOps
 
-trait SeparateSparkContext extends BeforeAndAfterAll {
+trait SeparateSparkContext extends FlatSpec {
 
-  this: Suite =>
+  case class FixtureParam(sc: SparkContext)
 
-  var sc: SparkContext = null
+  def withFixture(test: OneArgTest): Outcome = {
 
-  override def beforeAll: Unit = {
-    sc = SparkTestContext.createTestContext()
-    super.beforeAll
-  }
+    val sc = createTestContext()
 
-  override def afterAll: Unit = {
     try
-      super.afterAll
+      withFixture(test toNoArgTest FixtureParam(sc))
     finally
       sc stop
   }

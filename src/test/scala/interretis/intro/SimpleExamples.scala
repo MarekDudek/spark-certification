@@ -1,21 +1,19 @@
 package interretis.intro
 
-import org.scalatest.FlatSpec
-import org.scalatest.Matchers
-import language.postfixOps
-import interretis.utils.SparkTestContext.createTestContext
-import org.scalatest.BeforeAndAfterAll
 import interretis.utils.SeparateSparkContext
+import org.scalatest.Matchers
 
-class SimpleExamples extends FlatSpec with Matchers with SeparateSparkContext {
+import language.postfixOps
 
-  "Local data" should "be parallelized" in {
+class SimpleExamples extends SeparateSparkContext with Matchers {
+
+  "Local data" should "be parallelized" in { f =>
 
     // given
     val data = 1 to 1000
 
     // when
-    val distData = sc parallelize data
+    val distData = f.sc parallelize data
     val belowTen = distData filter (_ < 10) collect
 
     // then

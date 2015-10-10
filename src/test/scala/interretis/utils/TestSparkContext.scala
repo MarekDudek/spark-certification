@@ -3,7 +3,7 @@ package interretis.utils
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
 
-object SparkTestContext {
+object TestSparkContext {
 
   def createTestContext(appName: String = "Test application", master: String = "local"): SparkContext = {
 
