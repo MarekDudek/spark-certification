@@ -1,6 +1,10 @@
 
-name := "Training project for Spark certification"
+name := "Spark certification"
 version := "1.0"
+
+artifactName := {
+  (sv: ScalaVersion, module: ModuleID, artifact: Artifact) => "spark-certification.jar"
+}
 
 scalaVersion := "2.10.5"
 scalacOptions ++= Seq("-deprecation", "-explaintypes", "-feature", "-unchecked", "-optimise", "-target:jvm-1.7")
