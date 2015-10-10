@@ -9,6 +9,8 @@ import org.scalatest.Matchers
 
 class ExampleTest extends FlatSpec with Matchers with BeforeAndAfterAll {
 
+  // given
+
   var context: SparkContext = null
 
   override def beforeAll: Unit = {
@@ -20,10 +22,9 @@ class ExampleTest extends FlatSpec with Matchers with BeforeAndAfterAll {
     context = new SparkContext(config)
   }
 
-  "This test" should "check Spark application" in {
+  val book = "src/main/resources/alice-in-wonderland.txt"
 
-    // given
-    val book = "src/main/resources/alice-in-wonderland.txt"
+  "This test" should "check Spark processing" in {
 
     // when
     val verses = context textFile book cache
@@ -32,5 +33,18 @@ class ExampleTest extends FlatSpec with Matchers with BeforeAndAfterAll {
 
     // then
     characterCount shouldBe 396
+  }
+
+  "This test" should "check character count application" in {
+
+    // given
+    val verses = context textFile book
+
+    // when
+    val app = new CharacterCount
+    val count = app countCharacter (verses, "Alice")
+
+    // then
+    count shouldBe 396
   }
 }
