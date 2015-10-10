@@ -1,4 +1,4 @@
-package interretis
+package interretis.utils
 
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext

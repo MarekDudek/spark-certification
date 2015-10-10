@@ -2,24 +2,22 @@ package interretis
 
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers
-
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
-
-import interretis.SparkTestContext.createTestContext
-
+import interretis.utils.SparkTestContext.createTestContext
 import language.postfixOps
+import org.scalatest.BeforeAndAfterAll
+import interretis.utils.SeparateSparkContext
 
-class ExampleTest extends FlatSpec with Matchers {
+class ExampleTest extends FlatSpec with Matchers with SeparateSparkContext {
 
   // given
-  val context = createTestContext()
   val book = "src/main/resources/alice-in-wonderland.txt"
 
   "This test" should "check Spark processing" in {
 
     // when
-    val verses = context textFile book cache
+    val verses = sc textFile book cache
     val alices = verses filter (_ contains "Alice")
     val characterCount = alices count
 
@@ -30,7 +28,7 @@ class ExampleTest extends FlatSpec with Matchers {
   "This test" should "check character count application" in {
 
     // given
-    val verses = context textFile book
+    val verses = sc textFile book
 
     // when
     val app = new CharacterCount

@@ -17,3 +17,5 @@ libraryDependencies ++= Seq(
 )
 
 scalastyleConfig := file("project/scalastyle-config.xml")
+
+parallelExecution in Test := false
