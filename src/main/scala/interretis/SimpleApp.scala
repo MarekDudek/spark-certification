@@ -14,7 +14,7 @@ object SimpleApp {
 
     val book = "src/main/resources/alice-in-wonderland.txt"
 
-    val verses = sc textFile (book, 8) cache
+    val verses = sc textFile book cache
     val alices = verses filter (_.contains("Alice"))
 
     val count = alices.count

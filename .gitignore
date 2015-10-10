@@ -26,6 +26,7 @@ project/boot/
 project/plugins/project/
 
 .cache-main
+.cache-tests
 
 derby.log
 metastore_db/
