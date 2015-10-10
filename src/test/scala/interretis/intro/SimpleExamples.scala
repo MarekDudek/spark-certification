@@ -2,8 +2,8 @@ package interretis.intro
 
 import interretis.utils.SeparateSparkContext
 import org.scalatest.Matchers
-
 import language.postfixOps
+import interretis.utils.Resources
 
 class SimpleExamples extends SeparateSparkContext with Matchers {
 
@@ -19,5 +19,23 @@ class SimpleExamples extends SeparateSparkContext with Matchers {
     // then
 
     belowTen shouldBe Array(1, 2, 3, 4, 5, 6, 7, 8, 9)
+  }
+
+  "Log mining" should "be deconstructed" in { f =>
+
+    // given
+    val lines = f.sc textFile (Resources.mainResources + "/log.txt")
+
+    // when
+    val errors = lines filter (_ startsWith "ERROR")
+    val messages = errors map (_ split "\t") map (_(1))
+    messages cache ()
+
+    val mysql = messages filter (_ contains "mysql")
+    val php = messages filter (_ contains "php")
+
+    // then
+    mysql count () shouldBe 2
+    php count () shouldBe 1
   }
 }

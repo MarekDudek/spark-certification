@@ -1,15 +1,15 @@
 package interretis
 
 import interretis.utils.SeparateSparkContext
+import interretis.utils.Resources
 import org.scalatest.fixture.FlatSpec
 import org.scalatest.Matchers
-
 import language.postfixOps
 
 class ExampleTest extends SeparateSparkContext with Matchers {
 
   // given
-  val book = "src/main/resources/alice-in-wonderland.txt"
+  val book = Resources.mainResources + "/alice-in-wonderland.txt"
 
   "This test" should "check Spark processing" in { f =>
 

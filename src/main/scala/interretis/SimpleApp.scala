@@ -1,8 +1,8 @@
 package interretis
 
+import interretis.utils.Resources
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
-
 import language.postfixOps
 
 object SimpleApp {
@@ -12,7 +12,7 @@ object SimpleApp {
     val conf = new SparkConf() setAppName ("Simple Application")
     val sc = new SparkContext(conf)
 
-    val book = "src/main/resources/alice-in-wonderland.txt"
+    val book = Resources.mainResources + "/alice-in-wonderland.txt"
 
     val verses = sc textFile book cache
     val alices = verses filter (_.contains("Alice"))
