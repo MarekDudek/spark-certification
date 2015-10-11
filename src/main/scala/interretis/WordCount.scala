@@ -3,6 +3,17 @@ package interretis
 import interretis.utils.SparkContextBuilder.buildContext
 import org.apache.spark.rdd.RDD
 
+class WordCount {
+
+  def wordCount(lines: RDD[String]): RDD[(String, Int)] = {
+
+    val words = lines flatMap (_ split " ")
+    val occurences = words map ((_, 1)) cache ()
+    val wordCounts = occurences reduceByKey (_ + _)
+    wordCounts
+  }
+}
+
 object WordCount {
 
   def main(args: Array[String]): Unit = {
@@ -34,13 +45,3 @@ object WordCount {
   }
 }
 
-class WordCount {
-
-  def wordCount(lines: RDD[String]): RDD[(String, Int)] = {
-
-    val words = lines flatMap (_ split " ")
-    val occurences = words map ((_, 1)) cache ()
-    val wordCounts = occurences reduceByKey (_ + _)
-    wordCounts
-  }
-}
