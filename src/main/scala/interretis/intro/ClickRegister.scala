@@ -1,6 +1,6 @@
 package interretis.intro
 
-import ClickRegister.{ uuidRegisterPairFromTokens, uuidClickPairFromTokens }
+import ClickRegister.{ uuidRegisterPairFromTokens, uuidClickPairFromTokens, splitByTab }
 import interretis.utils.SparkContextBuilder.buildContext
 import org.apache.spark.rdd.RDD
 import java.util.Date
@@ -15,8 +15,8 @@ class ClickRegister {
 
   def process(registerLines: RDD[String], clickLines: RDD[String]): RDD[(String, (Register, Click))] = {
 
-    val registers = registerLines map (_ split "\t") map uuidRegisterPairFromTokens
-    val clicks = clickLines map (_ split "\t") map uuidClickPairFromTokens
+    val registers = registerLines map splitByTab map uuidRegisterPairFromTokens
+    val clicks = clickLines map splitByTab map uuidClickPairFromTokens
 
     val result = registers join clicks
     result
@@ -25,26 +25,26 @@ class ClickRegister {
 
 object ClickRegister {
 
-  val format = new SimpleDateFormat("yyyy-MM-dd")
+  private def newDateFormat =
+    new SimpleDateFormat("yyyy-MM-dd")
 
-  def uuidRegisterPairFromTokens(tokens: Array[String]): (String, Register) = {
+  private def uuidRegisterPairFromTokens(tokens: Array[String]): (String, Register) = {
     val uuid = tokens(1)
     val register = registerFromTokens(tokens)
     (uuid, register)
   }
 
   private def registerFromTokens(tokens: Array[String]): Register =
-    Register(format.parse(tokens(0)), tokens(1), tokens(2), tokens(3) toFloat, tokens(4) toFloat)
+    Register(newDateFormat parse tokens(0), tokens(1), tokens(2), tokens(3) toFloat, tokens(4) toFloat)
 
-  def uuidClickPairFromTokens(tokens: Array[String]): (String, Click) = {
+  private def uuidClickPairFromTokens(tokens: Array[String]): (String, Click) = {
     val uuid = tokens(1)
     val click = clickFromTokens(tokens)
     (uuid, click)
   }
 
-  private def clickFromTokens(tokens: Array[String]): Click = {
-    Click(format.parse(tokens(0)), tokens(1), tokens(2).trim.toInt)
-  }
+  private def clickFromTokens(tokens: Array[String]): Click =
+    Click(newDateFormat parse tokens(0), tokens(1), tokens(2).trim.toInt)
 
   def main(args: Array[String]): Unit = {
 
@@ -57,7 +57,7 @@ object ClickRegister {
 
     val app = new ClickRegister
 
-    val result = app.process(registerLines, clickLines)
+    val result = app process (registerLines, clickLines)
     result saveAsTextFile output
   }
 
@@ -77,4 +77,6 @@ object ClickRegister {
 
     (registersInput, clicksInput, output)
   }
+
+  private def splitByTab(arg: String) = arg split "\t"
 }

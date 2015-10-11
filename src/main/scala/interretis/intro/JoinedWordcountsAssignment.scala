@@ -42,7 +42,7 @@ object JoinedWordcountsAssignment {
 
 class JoinedWordcountsAssignment {
 
-  def process(readmeLines: RDD[String], contributingLines: RDD[String]) = {
+  def process(readmeLines: RDD[String], contributingLines: RDD[String]): RDD[(String, (Int, Int))] = {
 
     val wordCount = new WordCount
 
