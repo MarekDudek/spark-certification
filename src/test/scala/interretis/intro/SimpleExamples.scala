@@ -4,7 +4,6 @@ import interretis.utils.SeparateSparkContext
 import org.scalatest.Matchers
 import language.postfixOps
 import interretis.utils.Resources
-import interretis.WordCount
 
 class SimpleExamples extends SeparateSparkContext with Matchers {
 

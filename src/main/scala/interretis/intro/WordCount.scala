@@ -1,7 +1,8 @@
-package interretis
+package interretis.intro
 
 import interretis.utils.SparkContextBuilder.buildContext
 import org.apache.spark.rdd.RDD
+import org.apache.spark.rdd.RDD.rddToPairRDDFunctions
 
 class WordCount {
 
