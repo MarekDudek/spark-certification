@@ -1,8 +1,6 @@
 package interretis
 
-import org.apache.spark.SparkConf
-import org.apache.spark.SparkConf
-import org.apache.spark.SparkContext
+import interretis.utils.SparkContextBuilder.buildContext
 import org.apache.spark.rdd.RDD
 
 import language.postfixOps
@@ -21,8 +19,8 @@ object CharacterCount {
   def main(args: Array[String]): Unit = {
 
     val (book, character) = processArguments(args)
-    val context = createContext
-    val verses = context textFile book
+    val sc = buildContext(appName = "Character Count")
+    val verses = sc textFile book
 
     val app = new CharacterCount
     val count = app countCharacter (verses, character)
@@ -44,13 +42,5 @@ object CharacterCount {
     val character = args(1)
 
     (book, character)
-  }
-
-  private def createContext = {
-
-    val config = new SparkConf
-    config setAppName "Character count"
-
-    new SparkContext(config)
   }
 }
