@@ -4,6 +4,7 @@ import interretis.utils.SeparateSparkContext
 import org.scalatest.Matchers
 import language.postfixOps
 import interretis.utils.Resources
+import interretis.WordCount
 
 class SimpleExamples extends SeparateSparkContext with Matchers {
 
@@ -37,5 +38,21 @@ class SimpleExamples extends SeparateSparkContext with Matchers {
     // then
     mysql count () shouldBe 2
     php count () shouldBe 1
+  }
+
+  "Word count" should "work" in { f =>
+
+    // given
+    val lines = f.sc textFile (Resources.mainResources + "/alice-in-wonderland.txt")
+
+    // when
+    val app = new WordCount
+    val counts = app wordCount lines
+    val results = counts collect ()
+
+    // then
+    results should contain("Alice" -> 221)
+    results should contain("Queen" -> 34)
+    results should contain("Hatter" -> 24)
   }
 }
