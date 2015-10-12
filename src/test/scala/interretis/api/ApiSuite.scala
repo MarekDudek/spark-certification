@@ -118,15 +118,35 @@ class ApiSuite extends SeparateSparkContext with Matchers {
     val setB = f.sc parallelize Array((1, List('d')), (3, Nil), (4, List('z')), (1, List('t', 'z')))
 
     // when
-    val joined = setA join setB
+    val joined = setA join setB collect
 
     // then
-    joined.collect should have size 5
 
-    joined.collect should contain((1, (A, List('d'))))
-    joined.collect should contain((1, (A, List('t', 'z'))))
-    joined.collect should contain((1, (D, List('d'))))
-    joined.collect should contain((1, (D, List('t', 'z'))))
-    joined.collect should contain((3, (C, Nil)))
+    joined should have size 5
+
+    joined should contain((1, (A, List('d'))))
+    joined should contain((1, (A, List('t', 'z'))))
+    joined should contain((1, (D, List('d'))))
+    joined should contain((1, (D, List('t', 'z'))))
+    joined should contain((3, (C, Nil)))
+  }
+
+  "cogroup" should "group datasets" in { f =>
+
+    // given
+    val setA = f.sc parallelize Array((1, A), (2, B), (3, C), (1, D))
+    val setB = f.sc parallelize Array((1, List('d')), (3, Nil), (4, List('z')), (1, List('t', 'z')))
+
+    // when
+    val cogrouped = setA cogroup setB collect
+
+    // then
+
+    cogrouped should have size 4
+
+    cogrouped should contain(1, (List(A, D), List(List('d'), List('t', 'z'))))
+    cogrouped should contain(2, (List(B), List()))
+    cogrouped should contain(3, (List(C), List(Nil)))
+    cogrouped should contain(4, (List(), List(List('z'))))
   }
 }
