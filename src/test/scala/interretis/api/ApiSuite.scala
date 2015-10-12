@@ -72,6 +72,8 @@ class ApiSuite extends SeparateSparkContext with Matchers {
 
   val A = "A"
   val B = "B"
+  val C = "C"
+  val D = "D"
 
   "groupByKey" should "return values grouped by first elements of pairs" in { f =>
 
@@ -95,5 +97,36 @@ class ApiSuite extends SeparateSparkContext with Matchers {
 
     // then
     aggregated.collect should contain allOf ((1, "AB"), (2, A), (3, B))
+  }
+
+  "sortByKey" should "return datased sorted by key" in { f =>
+
+    // given
+    val pairs = f.sc parallelize Array((4, A), (2, A), (1, B), (3, B))
+
+    // when
+    val sorted = pairs sortByKey ()
+
+    // then
+    sorted.collect shouldBe Array((1, B), (2, A), (3, B), (4, A))
+  }
+
+  "join" should "join datasets by key" in { f =>
+
+    // given
+    val setA = f.sc parallelize Array((1, A), (2, B), (3, C), (1, D))
+    val setB = f.sc parallelize Array((1, List('d')), (3, Nil), (4, List('z')), (1, List('t', 'z')))
+
+    // when
+    val joined = setA join setB
+
+    // then
+    joined.collect should have size 5
+
+    joined.collect should contain((1, (A, List('d'))))
+    joined.collect should contain((1, (A, List('t', 'z'))))
+    joined.collect should contain((1, (D, List('d'))))
+    joined.collect should contain((1, (D, List('t', 'z'))))
+    joined.collect should contain((3, (C, Nil)))
   }
 }
