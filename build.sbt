@@ -7,7 +7,7 @@ artifactName := {
 }
 
 scalaVersion := "2.10.5"
-scalacOptions ++= Seq("-deprecation", "-explaintypes", "-feature", "-unchecked", "-optimise", "-target:jvm-1.7")
+scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked", "-optimise", "-target:jvm-1.7")
 
 libraryDependencies ++= Seq(
 
