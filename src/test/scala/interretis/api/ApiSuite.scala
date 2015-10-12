@@ -149,4 +149,17 @@ class ApiSuite extends SeparateSparkContext with Matchers {
     cogrouped should contain(3, (List(C), List(Nil)))
     cogrouped should contain(4, (List(), List(List('z'))))
   }
+
+  "cartesian" should "give product of two datasets" in { f =>
+
+    // given
+    val setA = f.sc parallelize Array(1, 2, 3)
+    val setB = f.sc parallelize Array(A, B)
+
+    // when
+    val product = setA cartesian setB
+
+    // then
+    product.collect should contain allOf ((1, A), (1, B), (2, A), (2, B), (3, A), (3, B))
+  }
 }
