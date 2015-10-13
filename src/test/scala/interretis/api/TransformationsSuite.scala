@@ -6,7 +6,7 @@ import org.apache.spark.rdd.RDD
 import scala.math.pow
 import language.postfixOps
 
-class TransformationsSuite extends SeparateSparkContext with Matchers {
+class TransformationsSuite extends SeparateSparkContext with Letters with Matchers {
 
   "map" should "transform whole input with function" in { f =>
 
@@ -81,11 +81,6 @@ class TransformationsSuite extends SeparateSparkContext with Matchers {
     val collected = distinctNumbers.collect.toList
     collected should contain allOf (1, 2, 3, 4, 5)
   }
-
-  val A = "A"
-  val B = "B"
-  val C = "C"
-  val D = "D"
 
   "groupByKey" should "return values grouped by first elements of pairs" in { f =>
 

@@ -5,7 +5,7 @@ import interretis.utils.FileSystemUtils
 import org.scalatest.Matchers
 import language.postfixOps
 
-class ActionsSuite extends SeparateSparkContext with Matchers {
+class ActionsSuite extends SeparateSparkContext with Matchers with Letters {
 
   "reduce" should "aggregate elements using function" in { f =>
 
@@ -82,5 +82,30 @@ class ActionsSuite extends SeparateSparkContext with Matchers {
     val numbersAgain = lines map (_.toInt)
 
     numbers.collect shouldBe numbersAgain.collect
+  }
+
+  "countByKey" should "count elements that have matching key" in { f =>
+
+    // given
+    val pairs = f.sc parallelize Array((1, A), (2, A), (1, B), (3, B))
+
+    // when
+    val counted = pairs countByKey
+
+    // then
+    counted should contain allOf ((1 -> 2), (2 -> 1), (3 -> 1))
+  }
+
+  "foreach" should "run function on each element of the dataset" in { f =>
+
+    // given
+    val numbers = f.sc parallelize (1 to 5)
+    val acc = f.sc accumulator (0)
+
+    // when
+    numbers foreach (acc += _)
+
+    // then
+    acc.value shouldBe 15
   }
 }
