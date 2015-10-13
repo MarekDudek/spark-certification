@@ -1,6 +1,7 @@
 package interretis.api
 
 import interretis.utils.SeparateSparkContext
+import interretis.utils.FileSystemUtils
 import org.scalatest.Matchers
 import language.postfixOps
 
@@ -64,5 +65,22 @@ class ActionsSuite extends SeparateSparkContext with Matchers {
 
     // then
     sample should contain oneOf (1, 2, 3, 4, 5)
+  }
+
+  "saveAsTextFile" should "save data into filesystem" in { f =>
+
+    val tempDir = FileSystemUtils createTempDirectory ("target", "action-suite-")
+    val outputDir = FileSystemUtils buildPath (tempDir, "numbers")
+
+    val numbers = f.sc parallelize (1 to 5)
+
+    // when
+    numbers saveAsTextFile outputDir
+
+    // then
+    val lines = f.sc textFile outputDir
+    val numbersAgain = lines map (_.toInt)
+
+    numbers.collect shouldBe numbersAgain.collect
   }
 }
