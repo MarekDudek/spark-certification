@@ -6,7 +6,7 @@ import org.apache.spark.rdd.RDD
 import scala.math.pow
 import language.postfixOps
 
-class ApiSuite extends SeparateSparkContext with Matchers {
+class TransformationsSuite extends SeparateSparkContext with Matchers {
 
   "map" should "transform whole input with function" in { f =>
 
@@ -42,6 +42,18 @@ class ApiSuite extends SeparateSparkContext with Matchers {
 
     // then
     sequences.collect shouldBe Array(1, 1, 2, 1, 2, 3, 1, 2, 3, 4, 1, 2, 3, 4, 5)
+  }
+
+  "sample" should "should return fraction of data" in { f =>
+
+    // given
+    val numbers = f.sc parallelize (1 to 5)
+
+    // when
+    val single = numbers sample (false, 0.2, 0)
+
+    // then
+    single.collect should contain oneOf (1, 2, 3, 4, 5)
   }
 
   "union" should "sum the data from two sets" in { f =>
