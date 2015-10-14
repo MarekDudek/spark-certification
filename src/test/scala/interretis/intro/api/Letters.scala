@@ -1,4 +1,4 @@
-package interretis.api
+package interretis.intro.api
 
 trait Letters {
 

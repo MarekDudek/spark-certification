@@ -1,4 +1,4 @@
-package interretis.api
+package interretis.intro.api
 
 import interretis.utils.SeparateSparkContext
 import org.scalatest.Matchers
