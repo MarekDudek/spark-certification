@@ -3,3 +3,6 @@ To do
 	1. Persistence options
 	2. Broadcast variables
 	3. Accumulators
+	
+	4. K-means
+	5. PageRank
