@@ -6,3 +6,5 @@ To do
 	
 	4. K-means
 	5. PageRank
+	
+	6. Hive

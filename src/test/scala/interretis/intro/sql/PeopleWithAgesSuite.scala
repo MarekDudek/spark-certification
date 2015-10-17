@@ -5,6 +5,7 @@ import interretis.utils.SeparateSparkContext
 import org.apache.spark.sql.SQLContext
 import org.scalatest.Matchers
 import language.postfixOps
+import org.apache.spark.sql.hive.HiveContext
 
 case class Person(name: String, age: Int)
 
@@ -25,5 +26,16 @@ class PeopleWithAgesSuite extends SeparateSparkContext with Matchers {
 
     // then
     teenagers.count shouldBe 1
+  }
+
+  ignore should "operate on Hive" in { f =>
+
+    val hiveContext = new HiveContext(f.sc)
+    import hiveContext._
+    import hiveContext.implicits._
+
+    sql("CREATE TABLE IF NOT EXISTS src (key INT, value STRING)")
+    sql("src/main/resources/kv1.txt' INTO TABLE src")
+    sql("FROM src SELECT key, value").collect foreach(println)
   }
 }
