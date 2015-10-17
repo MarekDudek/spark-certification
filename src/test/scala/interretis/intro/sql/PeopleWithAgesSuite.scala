@@ -7,6 +7,7 @@ import org.scalatest.Matchers
 import language.postfixOps
 import org.apache.spark.sql.hive.HiveContext
 import org.apache.spark.sql.Row
+import scala.collection.mutable.WrappedArray
 
 case class Person(name: String, age: Int)
 
@@ -50,7 +51,7 @@ class PeopleWithAgesSuite extends SeparateSparkContext with Matchers {
     import sqlContext.implicits._
 
     // when
-    val parquetFile = read.parquet(Resources.mainResources + "/users.parquet")
+    val parquetFile = read parquet (Resources.mainResources + "/users.parquet")
     parquetFile registerTempTable "users"
 
     // then
@@ -66,6 +67,13 @@ class PeopleWithAgesSuite extends SeparateSparkContext with Matchers {
     name shouldBe "Ben"
 
     // when
-    val all = sqlContext sql "SELECT * FROM users"
+    val rows = sqlContext sql "SELECT name, favorite_color, favorite_numbers FROM users WHERE name = 'Ben'"
+    val objects = rows map {
+      case Row(name: String, favorite_color: String, favorite_numbers: Seq[String] @unchecked) =>
+        (name, favorite_color, favorite_numbers.toList)
+    }
+
+    // then
+    objects.collect should have length 1
   }
 }
