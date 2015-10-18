@@ -7,33 +7,34 @@ import org.apache.spark.sql.SQLContext
 
 object WikiExploration {
 
-  val dataDirectory = mainResources + "/wiki_parquet"
+  private val dataDirectory = mainResources + "/wiki_parquet"
+  private val table = "wikiData"
 
   def main(args: Array[String]): Unit = {
 
     val sqlContext = buildSqlContext(getClass.getSimpleName)
-    loadWikiData(sqlContext)
 
-    val app = new WikiExploration
+    val app = new WikiExploration(sqlContext)
 
-    val count = app countArticles sqlContext
+    val count = app.countArticles
     println(s"There are $count articles in Wiki")
   }
 
-  def loadWikiData(sqlContext: SQLContext): Unit = {
-
+  private def loadWikiData(sqlContext: SQLContext): Unit = {
     val data = sqlContext.read.parquet(dataDirectory)
-    data registerTempTable "wikiData"
+    data registerTempTable table
   }
 }
 
-class WikiExploration {
+class WikiExploration(sqlContext: SQLContext) {
 
-  def countArticles(sqlContext: SQLContext): Long = {
+  import sqlContext.implicits._
+  import WikiExploration.{ loadWikiData, table }
 
-    import sqlContext.implicits._
+  loadWikiData(sqlContext)
 
-    val df = sqlContext.sql("SELECT count(*) FROM wikiData")
+  def countArticles: Long = {
+    val df = sqlContext.sql(s"SELECT count(*) FROM $table")
     df.collect.head.getLong(0)
   }
 }
