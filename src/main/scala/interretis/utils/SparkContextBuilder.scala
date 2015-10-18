@@ -2,6 +2,7 @@ package interretis.utils
 
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
+import org.apache.spark.sql.SQLContext
 
 object SparkContextBuilder {
 
@@ -10,7 +11,13 @@ object SparkContextBuilder {
     val config = new SparkConf
     config setAppName appName
 
-    val context = new SparkContext(config)
-    context
+    new SparkContext(config)
+  }
+
+  def buildSqlContext(appName: String): SQLContext = {
+
+    val context = buildContext(appName)
+
+    new SQLContext(context)
   }
 }
