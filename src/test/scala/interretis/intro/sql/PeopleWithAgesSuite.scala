@@ -2,12 +2,13 @@ package interretis.intro.sql
 
 import interretis.utils.Resources
 import interretis.utils.SeparateSparkContext
+import interretis.utils.FileSystemUtils
 import org.apache.spark.sql.SQLContext
-import org.scalatest.Matchers
-import language.postfixOps
 import org.apache.spark.sql.hive.HiveContext
 import org.apache.spark.sql.Row
+import org.scalatest.Matchers
 import scala.collection.mutable.WrappedArray
+import language.postfixOps
 
 case class Person(name: String, age: Int)
 
@@ -43,7 +44,7 @@ class PeopleWithAgesSuite extends SeparateSparkContext with Matchers {
     sql("FROM src SELECT key, value").collect foreach (println)
   }
 
-  "Spark" should "work with Parquet files" in { f =>
+  it should "read Parquet files" in { f =>
 
     // given
     val sqlContext = new SQLContext(f.sc)
@@ -51,12 +52,24 @@ class PeopleWithAgesSuite extends SeparateSparkContext with Matchers {
     import sqlContext.implicits._
 
     // when
-    val parquetFile = read parquet (Resources.mainResources + "/users.parquet")
-    parquetFile registerTempTable "users"
+    val users = read parquet (Resources.mainResources + "/users.parquet")
+    users registerTempTable "users"
 
     // then
-    parquetFile.count shouldBe 2
-    parquetFile.columns shouldBe Array("name", "favorite_color", "favorite_numbers")
+    users.count shouldBe 2
+    users.columns shouldBe Array("name", "favorite_color", "favorite_numbers")
+  }
+
+  it should "allow matching on data frames" in { f =>
+
+    // given
+    val sqlContext = new SQLContext(f.sc)
+    import sqlContext._
+    import sqlContext.implicits._
+
+    // when
+    val users = read parquet (Resources.mainResources + "/users.parquet")
+    users registerTempTable "users"
 
     // when
     val red = sql("SELECT name FROM users WHERE favorite_color = 'red'")
@@ -75,5 +88,21 @@ class PeopleWithAgesSuite extends SeparateSparkContext with Matchers {
 
     // then
     objects.collect should have length 1
+  }
+
+  it should "allow writing data frames to Parquet files" in { f =>
+
+    // given
+    val sqlContext = new SQLContext(f.sc)
+    import sqlContext._
+    import sqlContext.implicits._
+    val tempDir = FileSystemUtils createTempDirectory ("target", "people-with-ages-")
+
+    // when
+    val numbers = f.sc parallelize Array(1, 2, 3, 4, 5, 6, 7, 8, 8)
+    val dataFrame = numbers.toDF()
+    dataFrame.write.parquet(tempDir + "/numbers.parquet")
+
+    // then it doesn't break
   }
 }
