@@ -31,6 +31,22 @@ class PeopleWithAgesSuite extends SeparateSparkContext with Matchers {
     teenagers.count shouldBe 1
   }
 
+  it should "allow using DSL" in { f =>
+
+    // given
+    val sqlContext = new SQLContext(f.sc)
+    import sqlContext.implicits._
+
+    val peopleLines = f.sc textFile (Resources.mainResources + "/people.txt")
+    val people = peopleLines map (_ split ",") map (p => Person(p(0), p(1).trim.toInt)) toDF
+
+    // when
+    val teenagers = people where ('age >= 13) where ('age <= 19) select ('name)
+
+    // then
+    teenagers.collect should have size 1
+  }
+
   ignore should "operate on Hive" in { f =>
 
     // given
