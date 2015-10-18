@@ -2,6 +2,7 @@ package interretis.utils
 
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
+import org.apache.spark.sql.SQLContext
 
 object TestSparkContext {
 
@@ -13,5 +14,10 @@ object TestSparkContext {
     config setMaster master
 
     new SparkContext(config)
+  }
+
+  def createTestSqlContext(context: SparkContext): SQLContext = {
+
+    new SQLContext(context)
   }
 }

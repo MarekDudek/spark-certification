@@ -12,19 +12,23 @@ object WikiExploration {
   def main(args: Array[String]): Unit = {
 
     val sqlContext = buildSqlContext(getClass.getSimpleName)
-    
-    val data = sqlContext.read.parquet(dataDirectory)
-    data registerTempTable "wikiData"
-    
+    loadWikiData(sqlContext)
+
     val app = new WikiExploration
-    
+
     val count = app countArticles sqlContext
     println(s"There are $count articles in Wiki")
+  }
+
+  def loadWikiData(sqlContext: SQLContext): Unit = {
+
+    val data = sqlContext.read.parquet(dataDirectory)
+    data registerTempTable "wikiData"
   }
 }
 
 class WikiExploration {
-  
+
   def countArticles(sqlContext: SQLContext): Long = {
 
     import sqlContext.implicits._

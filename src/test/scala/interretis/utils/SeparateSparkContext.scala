@@ -1,11 +1,9 @@
 package interretis.utils
 
-import org.apache.spark.SparkContext
 import interretis.utils.TestSparkContext.createTestContext
-
+import org.apache.spark.SparkContext
 import org.scalatest.fixture.FlatSpec
 import org.scalatest.Outcome
-
 import language.postfixOps
 
 trait SeparateSparkContext extends FlatSpec {
