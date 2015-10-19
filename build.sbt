@@ -16,7 +16,8 @@ libraryDependencies ++= Seq(
 	"org.apache.spark" %% "spark-hive" % "1.5.1" withSources() withJavadoc(),
 	"org.apache.spark" %% "spark-catalyst" % "1.5.1" withSources() withJavadoc(),
 	"org.apache.spark" %% "spark-streaming" % "1.5.1" withSources() withJavadoc(),
-
+	"org.apache.spark" %% "spark-streaming-twitter" % "1.5.1" withSources() withJavadoc(),
+	
 	"org.scalatest"    %% "scalatest" % "2.2.4" % "test" withSources() withJavadoc()
 )
 
