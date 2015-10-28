@@ -1,8 +1,9 @@
 package interretis.advanced.mlib
 
+import interretis.utils.Resources
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers
-import interretis.utils.Resources
+import language.postfixOps
 
 class MovieRatingsSuite extends FlatSpec with Matchers {
 
@@ -11,7 +12,7 @@ class MovieRatingsSuite extends FlatSpec with Matchers {
   "My ratings" should "be possible to parse" in {
 
     // when
-    val rating = MovieRatings lineToRating line
+    val rating = MovieRatings ratingFromLine line
 
     // then
     rating.user shouldBe 0
@@ -25,7 +26,7 @@ class MovieRatingsSuite extends FlatSpec with Matchers {
     val file = Resources.mainResources + "/personalRatings.txt"
 
     // when
-    val ratings = MovieRatings loadRatings file
+    val ratings = MovieRatings loadMyRatings
 
     // then
     ratings should have size 8
