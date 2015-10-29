@@ -8,6 +8,7 @@ import scala.io.Source
 import language.postfixOps
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
+import org.apache.spark.mllib.recommendation.MatrixFactorizationModel
 
 object MovieRatings {
 
@@ -31,7 +32,7 @@ object MovieRatings {
     val (training, validation, test) = divide(timestampRatingRDD, myRatingsRDD)
     reportDivisionStats(training, validation, test)
 
-    // train(timestampRatingRDD)
+    train(training, validation, test)
 
     sc stop
   }
@@ -99,11 +100,54 @@ object MovieRatings {
     println(s"Training: $numTraining, validation: $numValidation, test: $numTest")
   }
 
-  def train(timestampRatingRDD: RDD[(Long, Rating)]): Unit = {
+  def train2(timestampRatingRDD: RDD[(Long, Rating)]): Unit = {
+
     val ratings = timestampRatingRDD.map { case (_, rating) => rating }
     val rank = 1
     val iterations = 1
     val lambda = 0.5
     ALS.train(ratings, rank, iterations, lambda)
+  }
+
+  private val ranks = List(8, 12)
+  private val lambdas = List(1.0, 10.0)
+  private val numIters = List(10, 20)
+
+  def train(training: RDD[Rating], validation: RDD[Rating], test: RDD[Rating]): Unit = {
+
+    var bestModel: Option[MatrixFactorizationModel] = None
+    var bestValidationRmse = Double.MaxValue
+    var bestRank = 0
+    var bestLambda = -1.0
+    var bestNumIter = -1
+
+    for {
+      rank <- ranks;
+      lambda <- lambdas;
+      numIter <- numIters
+    } {
+      val model = ALS.train(training, rank, numIter, lambda)
+      val validationRmse = computeRmse(model, validation)
+      println(s"RMSE (validation) = $validationRmse for the model trained with rank = $rank, lambda = $lambda, and numIter = $numIter.")
+      if (validationRmse < bestValidationRmse) {
+        bestModel = Some(model)
+        bestValidationRmse = validationRmse
+        bestRank = rank
+        bestLambda = lambda
+        bestNumIter = numIter
+      }
+    }
+
+    val testRmse = computeRmse(bestModel.get, test)
+    println(s"The best model was trained with rank = $bestRank and lambda = $bestLambda, and numIter = $bestNumIter, and its RMSE on test set is $testRmse.")
+  }
+
+  def computeRmse(model: MatrixFactorizationModel, data: RDD[Rating]): Double = {
+    val count = data.count
+    val predictions: RDD[Rating] = model.predict(data.map(rating => (rating.user, rating.product)))
+    val predictionsAndRatings = predictions.map(rating => ((rating.user, rating.product), rating.rating))
+      .join(data.map(rating => ((rating.user, rating.product), rating.rating)))
+      .values
+    math.sqrt(predictionsAndRatings.map(x => (x._1 - x._2) * (x._1 - x._2)).reduce(_ + _) / count)
   }
 }
