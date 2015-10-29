@@ -32,7 +32,16 @@ object MovieRatings {
     val (training, validation, test) = divide(timestampRatingRDD, myRatingsRDD)
     reportDivisionStats(training, validation, test)
 
-    train(training, validation, test)
+    val bestModel = train(training, validation, test)
+
+    val myRatedMovieIDs = myRatings.map(_.product).toSet
+    val candidates = sc.parallelize(moviesMap.keys.filter(!myRatedMovieIDs.contains(_)).toSeq)
+    val recommendations = bestModel.predict(candidates.map((0, _))).collect.sortBy(-_.rating).take(50)
+
+    val a = recommendations.zipWithIndex.foreach {
+      case (rating, index) =>
+        println("%2d : %s".format(index, moviesMap(rating.product)))
+    }
 
     sc stop
   }
@@ -53,7 +62,7 @@ object MovieRatings {
     }
   }
 
-  def loadMovies(sc: SparkContext): RDD[(Long, String)] = {
+  def loadMovies(sc: SparkContext): RDD[(Int, String)] = {
     sc textFile Movies map {
       line =>
         val fields = line split Separator
@@ -100,20 +109,11 @@ object MovieRatings {
     println(s"Training: $numTraining, validation: $numValidation, test: $numTest")
   }
 
-  def train2(timestampRatingRDD: RDD[(Long, Rating)]): Unit = {
-
-    val ratings = timestampRatingRDD.map { case (_, rating) => rating }
-    val rank = 1
-    val iterations = 1
-    val lambda = 0.5
-    ALS.train(ratings, rank, iterations, lambda)
-  }
-
   private val ranks = List(8, 12)
   private val lambdas = List(1.0, 10.0)
   private val numIters = List(10, 20)
 
-  def train(training: RDD[Rating], validation: RDD[Rating], test: RDD[Rating]): Unit = {
+  def train(training: RDD[Rating], validation: RDD[Rating], test: RDD[Rating]): MatrixFactorizationModel = {
 
     var bestModel: Option[MatrixFactorizationModel] = None
     var bestValidationRmse = Double.MaxValue
@@ -140,6 +140,7 @@ object MovieRatings {
 
     val testRmse = computeRmse(bestModel.get, test)
     println(s"The best model was trained with rank = $bestRank and lambda = $bestLambda, and numIter = $bestNumIter, and its RMSE on test set is $testRmse.")
+    bestModel.get
   }
 
   def computeRmse(model: MatrixFactorizationModel, data: RDD[Rating]): Double = {
@@ -149,5 +150,9 @@ object MovieRatings {
       .join(data.map(rating => ((rating.user, rating.product), rating.rating)))
       .values
     math.sqrt(predictionsAndRatings.map(x => (x._1 - x._2) * (x._1 - x._2)).reduce(_ + _) / count)
+  }
+
+  def recommedForMe(): Unit = {
+
   }
 }
